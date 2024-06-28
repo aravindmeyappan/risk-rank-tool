@@ -1,0 +1,82 @@
+.App {
+  font-family: Arial, sans-serif;
+}
+
+.top-bar {
+  background-color: rgb(215, 40, 50);
+  color: rgb(255, 255, 255);
+  padding: 10px;
+  text-align: center;
+}
+
+.container {
+  display: flex;
+}
+
+.left-panel {
+  width: 200px;
+  border-right: 1px solid #ddd;
+}
+
+.tab {
+  padding: 10px;
+  cursor: pointer;
+}
+
+.tab.selected {
+  background-color: rgb(244, 240, 237);
+  color: rgb(20, 20, 20);
+}
+
+.main-content {
+  flex: 1;
+  padding: 20px;
+  overflow-y: scroll;
+  height: calc(100vh - 40px); /* Adjust based on top-bar height */
+  scroll-behavior: smooth;
+}
+
+.card {
+  border: 1px solid #ddd;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.field-name {
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.field-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.field-input {
+  flex: 1;
+  margin-right: 20px;
+}
+
+.field-description {
+  flex: 1;
+}
+
+.right-panel {
+  width: 200px;
+  border-left: 1px solid #ddd;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+}
+
+.section {
+  padding: 10px;
+  cursor: pointer;
+}
+
+.section.selected {
+  background-color: #4CAF50;
+  color: white;
+}
