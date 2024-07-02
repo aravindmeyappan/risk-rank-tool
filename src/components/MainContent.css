@@ -3,4 +3,17 @@
     height: 90px; 
     resize: none; 
   }
+
+  .default-value {
+    color: lightgrey;
+  }
+  
+  .user-input {
+    color: black;
+  }
+  
+  .error-message {
+    color: red;
+    font-size: 0.9em;
+  }
   
