@@ -7,7 +7,6 @@ const MainContent = ({ fields, sections }) => {
   const [errors, setErrors] = useState({});
 
   useEffect(() => {
-    // Initialize formData with default values
     const initialFormData = {};
     sections.forEach(section => {
       initialFormData[section] = {};
@@ -59,8 +58,33 @@ const MainContent = ({ fields, sections }) => {
     return formData[section]?.[fieldName]?.[`input${inputIndex}`] === fields.find(field => field['Field-name'] === fieldName)[`default_input${inputIndex}`];
   };
 
+  const handleEditableButtonClick = (section, fieldName, inputIndex, targetFieldName) => {
+    let targetValue = 'Please input the necessary values for calculation';
+    
+    for (const sectionKey in formData) {
+      if (formData[sectionKey][targetFieldName]) {
+        targetValue = formData[sectionKey][targetFieldName][`input${inputIndex}`] || targetValue;
+        break;
+      }
+    }
+
+    console.log(targetValue);
+
+    setFormData(prevFormData => ({
+      ...prevFormData,
+      [section]: {
+        ...prevFormData[section],
+        [fieldName]: {
+          ...prevFormData[section]?.[fieldName],
+          [`input${inputIndex}`]: targetValue,
+        }
+      }
+    }));
+  };
+
   const handleSubmit = () => {
-    console.log('Form Data:', formData);
+    const submittedData = { ...formData };
+    console.log('Form Data on Submit:', submittedData);
     // Perform any additional actions with formData, such as sending it to a server
   };
 
@@ -78,7 +102,7 @@ const MainContent = ({ fields, sections }) => {
                     {field.input_type1 === 'text' && (
                       <input
                         type="text"
-                        defaultValue={field.default_input1}
+                        value={formData[section]?.[field['Field-name']]?.['input1'] || ''}
                         className={isDefaultValue(section, field['Field-name'], 1) ? 'default-value' : 'user-input'}
                         onChange={(e) => handleInputChange(section, field['Field-name'], 1, e.target.value)}
                       />
@@ -86,14 +110,14 @@ const MainContent = ({ fields, sections }) => {
                     {field.input_type1 === 'numeric' && (
                       <input
                         type="number"
-                        defaultValue={field.default_input1}
+                        value={formData[section]?.[field['Field-name']]?.['input1'] || ''}
                         className={isDefaultValue(section, field['Field-name'], 1) ? 'default-value' : 'user-input'}
                         onChange={(e) => handleInputChange(section, field['Field-name'], 1, e.target.value)}
                       />
                     )}
                     {field.input_type1 === 'dropdown' && (
                       <select
-                        defaultValue={field.default_input1}
+                        value={formData[section]?.[field['Field-name']]?.['input1'] || ''}
                         className={isDefaultValue(section, field['Field-name'], 1) ? 'default-value' : 'user-input'}
                         onChange={(e) => handleInputChange(section, field['Field-name'], 1, e.target.value)}
                       >
@@ -107,14 +131,15 @@ const MainContent = ({ fields, sections }) => {
                     {field.input_type1 === 'read-only' && (
                       <input
                         type="text"
-                        defaultValue={field.default_input1}
+                        value={formData[section]?.[field['Field-name']]?.['input1'] || field.default_input1}
                         className="default-value"
                         readOnly
+                        style={{width: "370px"}}
                       />
                     )}
                     {field.input_type1 === 'multiline' && (
                       <textarea
-                        defaultValue={field.default_input1}
+                        value={formData[section]?.[field['Field-name']]?.['input1'] || ''}
                         className={`fixed-size-textarea ${isDefaultValue(section, field['Field-name'], 1) ? 'default-value' : 'user-input'}`}
                         onChange={(e) => handleInputChange(section, field['Field-name'], 1, e.target.value)}
                       />
@@ -124,6 +149,9 @@ const MainContent = ({ fields, sections }) => {
                   {errors[section]?.[field['Field-name']]?.['input1'] && (
                     <div className="error-message">{errors[section][field['Field-name']]['input1']}</div>
                   )}
+                  {field.present_or_not1 === 'e' && (
+                    <button onClick={() => handleEditableButtonClick(section, field['Field-name'], 1, field.formula1)}>Evaluate</button>
+                  )}
                 </div>
               )}
               {field.present_or_not2 !== 'n' && (
@@ -132,7 +160,7 @@ const MainContent = ({ fields, sections }) => {
                     {field.input_type2 === 'text' && (
                       <input
                         type="text"
-                        defaultValue={field.default_input2}
+                        value={formData[section]?.[field['Field-name']]?.['input2'] || ''}
                         className={isDefaultValue(section, field['Field-name'], 2) ? 'default-value' : 'user-input'}
                         onChange={(e) => handleInputChange(section, field['Field-name'], 2, e.target.value)}
                       />
@@ -140,14 +168,14 @@ const MainContent = ({ fields, sections }) => {
                     {field.input_type2 === 'numeric' && (
                       <input
                         type="number"
-                        defaultValue={field.default_input2}
+                        value={formData[section]?.[field['Field-name']]?.['input2'] || ''}
                         className={isDefaultValue(section, field['Field-name'], 2) ? 'default-value' : 'user-input'}
                         onChange={(e) => handleInputChange(section, field['Field-name'], 2, e.target.value)}
                       />
                     )}
                     {field.input_type2 === 'dropdown' && (
                       <select
-                        defaultValue={field.default_input2}
+                        value={formData[section]?.[field['Field-name']]?.['input2'] || ''}
                         className={isDefaultValue(section, field['Field-name'], 2) ? 'default-value' : 'user-input'}
                         onChange={(e) => handleInputChange(section, field['Field-name'], 2, e.target.value)}
                       >
@@ -161,20 +189,24 @@ const MainContent = ({ fields, sections }) => {
                     {field.input_type2 === 'read-only' && (
                       <input
                         type="text"
-                        defaultValue={field.default_input2}
+                        value={formData[section]?.[field['Field-name']]?.['input2'] || field.default_input2}
                         className="default-value"
                         readOnly
+                        style={{width: "370px"}}
                       />
                     )}
                     {field.input_type2 === 'multiline' && (
                       <textarea
-                        defaultValue={field.default_input2}
+                        value={formData[section]?.[field['Field-name']]?.['input2'] || ''}
                         className={`fixed-size-textarea ${isDefaultValue(section, field['Field-name'], 2) ? 'default-value' : 'user-input'}`}
                         onChange={(e) => handleInputChange(section, field['Field-name'], 2, e.target.value)}
                       />
                     )}
                   </div>
                   <div className="field-description">{field.description2}</div>
+                  {errors[section]?.[field['Field-name']]?.['input2'] && (
+                    <div className="error-message">{errors[section][field['Field-name']]['input2']}</div>
+                  )}
                 </div>
               )}
               {field.present_or_not3 !== 'n' && (
@@ -183,7 +215,7 @@ const MainContent = ({ fields, sections }) => {
                     {field.input_type3 === 'text' && (
                       <input
                         type="text"
-                        defaultValue={field.default_input3}
+                        value={formData[section]?.[field['Field-name']]?.['input3'] || ''}
                         className={isDefaultValue(section, field['Field-name'], 3) ? 'default-value' : 'user-input'}
                         onChange={(e) => handleInputChange(section, field['Field-name'], 3, e.target.value)}
                       />
@@ -191,14 +223,14 @@ const MainContent = ({ fields, sections }) => {
                     {field.input_type3 === 'numeric' && (
                       <input
                         type="number"
-                        defaultValue={field.default_input3}
+                        value={formData[section]?.[field['Field-name']]?.['input3'] || ''}
                         className={isDefaultValue(section, field['Field-name'], 3) ? 'default-value' : 'user-input'}
                         onChange={(e) => handleInputChange(section, field['Field-name'], 3, e.target.value)}
                       />
                     )}
                     {field.input_type3 === 'dropdown' && (
                       <select
-                        defaultValue={field.default_input3}
+                        value={formData[section]?.[field['Field-name']]?.['input3'] || ''}
                         className={isDefaultValue(section, field['Field-name'], 3) ? 'default-value' : 'user-input'}
                         onChange={(e) => handleInputChange(section, field['Field-name'], 3, e.target.value)}
                       >
@@ -212,20 +244,24 @@ const MainContent = ({ fields, sections }) => {
                     {field.input_type3 === 'read-only' && (
                       <input
                         type="text"
-                        defaultValue={field.default_input3}
+                        value={formData[section]?.[field['Field-name']]?.['input3'] || field.default_input3}
                         className="default-value"
                         readOnly
+                        style={{width: "370px"}}
                       />
                     )}
                     {field.input_type3 === 'multiline' && (
                       <textarea
-                        defaultValue={field.default_input3}
+                        value={formData[section]?.[field['Field-name']]?.['input3'] || ''}
                         className={`fixed-size-textarea ${isDefaultValue(section, field['Field-name'], 3) ? 'default-value' : 'user-input'}`}
                         onChange={(e) => handleInputChange(section, field['Field-name'], 3, e.target.value)}
                       />
                     )}
                   </div>
                   <div className="field-description">{field.description3}</div>
+                  {errors[section]?.[field['Field-name']]?.['input3'] && (
+                    <div className="error-message">{errors[section][field['Field-name']]['input3']}</div>
+                  )}
                 </div>
               )}
               {field.present_or_not1 === 'e' && (
