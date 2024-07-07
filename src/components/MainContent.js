@@ -58,29 +58,130 @@ const MainContent = ({ fields, sections }) => {
     return formData[section]?.[fieldName]?.[`input${inputIndex}`] === fields.find(field => field['Field-name'] === fieldName)[`default_input${inputIndex}`];
   };
 
-  const handleEditableButtonClick = (section, fieldName, inputIndex, targetFieldName) => {
-    let targetValue = 'Please input the necessary values for calculation';
+  // const handleEditableButtonClick = (section, fieldName, inputIndex, targetFieldName) => {
+  //   let targetValue = 'Please input the necessary values for calculation';
     
-    for (const sectionKey in formData) {
-      if (formData[sectionKey][targetFieldName]) {
-        targetValue = formData[sectionKey][targetFieldName][`input${inputIndex}`] || targetValue;
-        break;
+  //   for (const sectionKey in formData) {
+  //     if (formData[sectionKey][targetFieldName]) {
+  //       targetValue = formData[sectionKey][targetFieldName][`input${inputIndex}`] || targetValue;
+  //       break;
+  //     }
+  //   }
+
+  //   console.log(targetValue);
+
+  //   setFormData(prevFormData => ({
+  //     ...prevFormData,
+  //     [section]: {
+  //       ...prevFormData[section],
+  //       [fieldName]: {
+  //         ...prevFormData[section]?.[fieldName],
+  //         [`input${inputIndex}`]: targetValue,
+  //       }
+  //     }
+  //   }));
+  // };
+  const handleEditableButtonClick = (section, fieldName, inputIndex, formData, formula) => {
+    const { fields, operator } = parseFormula(formula);
+  
+    let values = fields.map(field => {
+      for (const sec in formData) {
+        for (const f in formData[sec]) {
+          if (f === field) {
+            return formData[sec][f][`input${inputIndex}`];
+          }
+        }
       }
+      return null;
+    });
+  
+    if (values.includes(null) || values.includes('')) {
+      alert('Please enter all necessary columns for evaluation');
+      return;
     }
-
-    console.log(targetValue);
-
+  
+    let result;
+    switch (operator) {
+      case '+':
+        result = values.reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
+        break;
+      case '-':
+        result = values.reduce((a, b) => parseFloat(a) - parseFloat(b));
+        break;
+      case '*':
+        result = values.reduce((a, b) => parseFloat(a) * parseFloat(b), 1);
+        break;
+      case '/':
+        result = values.reduce((a, b) => parseFloat(a) / parseFloat(b));
+        break;
+      case 'Max':
+        result = Math.max(...values.map(v => parseFloat(v)));
+        break;
+      case 'Min':
+        result = Math.min(...values.map(v => parseFloat(v)));
+        break;
+      case 'yesand':
+        result = values.every(v => v === 'Yes') ? 'Yes' : 'No';
+        break;
+      case 'noand':
+        result = values.every(v => v === 'No') ? 'No' : 'Yes';
+        break;
+      default:
+        result = 'Invalid formula';
+    }
+  
+    console.log(result);
+  
     setFormData(prevFormData => ({
       ...prevFormData,
       [section]: {
         ...prevFormData[section],
         [fieldName]: {
           ...prevFormData[section]?.[fieldName],
-          [`input${inputIndex}`]: targetValue,
+          [`input${inputIndex}`]: result,
         }
       }
     }));
   };
+  
+  
+
+  const parseFormula = (formula) => {
+    const operators = ['+', '-', '*', '/', 'Max', 'Min', 'yesand', 'noand'];
+    let operator = null;
+    let fields = [];
+  
+    const yesAndMatch = formula.match(/yesand\(([^)]+)\)/);
+    const noAndMatch = formula.match(/noand\(([^)]+)\)/);
+    const maxMatch = formula.match(/Max\(([^)]+)\)/);
+    const minMatch = formula.match(/Min\(([^)]+)\)/);
+  
+    if (yesAndMatch) {
+      operator = 'yesand';
+      fields = yesAndMatch[1].split(',').map(f => f.trim());
+    } else if (noAndMatch) {
+      operator = 'noand';
+      fields = noAndMatch[1].split(',').map(f => f.trim());
+    } else if (maxMatch) {
+      operator = 'Max';
+      fields = maxMatch[1].split(',').map(f => f.trim());
+    } else if (minMatch) {
+      operator = 'Min';
+      fields = minMatch[1].split(',').map(f => f.trim());
+    } else {
+      for (const op of operators) {
+        if (formula.includes(op) && !operator) {
+          operator = op;
+          fields = formula.split(op).map(f => f.trim());
+          break;
+        }
+      }
+    }
+  
+    return { fields, operator };
+  };
+  
+  
 
   const handleSubmit = () => {
     const submittedData = { ...formData };
@@ -134,7 +235,6 @@ const MainContent = ({ fields, sections }) => {
                         value={formData[section]?.[field['Field-name']]?.['input1'] || field.default_input1}
                         className="default-value"
                         readOnly
-                        style={{width: "370px"}}
                       />
                     )}
                     {field.input_type1 === 'multiline' && (
@@ -150,7 +250,7 @@ const MainContent = ({ fields, sections }) => {
                     <div className="error-message">{errors[section][field['Field-name']]['input1']}</div>
                   )}
                   {field.present_or_not1 === 'e' && (
-                    <button onClick={() => handleEditableButtonClick(section, field['Field-name'], 1, field.formula1)}>Evaluate</button>
+                    <button onClick={() => handleEditableButtonClick(section, field['Field-name'], 1, formData, field.formula1)}>Evaluate</button>
                   )}
                 </div>
               )}
@@ -192,7 +292,6 @@ const MainContent = ({ fields, sections }) => {
                         value={formData[section]?.[field['Field-name']]?.['input2'] || field.default_input2}
                         className="default-value"
                         readOnly
-                        style={{width: "370px"}}
                       />
                     )}
                     {field.input_type2 === 'multiline' && (
@@ -206,6 +305,9 @@ const MainContent = ({ fields, sections }) => {
                   <div className="field-description">{field.description2}</div>
                   {errors[section]?.[field['Field-name']]?.['input2'] && (
                     <div className="error-message">{errors[section][field['Field-name']]['input2']}</div>
+                  )}
+                  {field.present_or_not2 === 'e' && (
+                    <button onClick={() => handleEditableButtonClick(section, field['Field-name'], 2, formData, field.formula1)}>Evaluate</button>
                   )}
                 </div>
               )}
@@ -247,7 +349,6 @@ const MainContent = ({ fields, sections }) => {
                         value={formData[section]?.[field['Field-name']]?.['input3'] || field.default_input3}
                         className="default-value"
                         readOnly
-                        style={{width: "370px"}}
                       />
                     )}
                     {field.input_type3 === 'multiline' && (
@@ -261,6 +362,9 @@ const MainContent = ({ fields, sections }) => {
                   <div className="field-description">{field.description3}</div>
                   {errors[section]?.[field['Field-name']]?.['input3'] && (
                     <div className="error-message">{errors[section][field['Field-name']]['input3']}</div>
+                  )}
+                  {field.present_or_not3 === 'e' && (
+                    <button onClick={() => handleEditableButtonClick(section, field['Field-name'], 3, formData, field.formula1)}>Evaluate</button>
                   )}
                 </div>
               )}
