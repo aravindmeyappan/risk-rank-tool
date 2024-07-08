@@ -1,5 +1,3 @@
-// AuthModal.js
-
 import React, { useState } from 'react';
 import './AuthModal.css';
 import { generateRandomId } from '../utils/utils'; 

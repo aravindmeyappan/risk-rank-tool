@@ -1,5 +1,3 @@
-// src/components/Card.js
-
 import React from 'react';
 import FieldInput from './FieldInput';
 

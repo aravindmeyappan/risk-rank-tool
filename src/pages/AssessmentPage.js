@@ -4,10 +4,12 @@ import TopBar from '../components/TopBar';
 import LeftPanel from '../components/LeftPanel';
 import MainContent from '../components/MainContent';
 import RightPanel from '../components/RightPanel';
+import axios from 'axios';
 import './AssessmentPage.css';
 
 const AssessmentPage = ({ data }) => {
   const [selectedTab, setSelectedTab] = useState('');
+  const [formData, setFormData] = useState({});
   const navigate = useNavigate();
   const location = useLocation();
   const { state } = location;
@@ -17,7 +19,10 @@ const AssessmentPage = ({ data }) => {
     if (data.length > 0) {
       setSelectedTab(data[0].Tab);
     }
-  }, [data]);
+    if (state && state.data) {
+      setFormData(state.data);
+    }
+  }, [data, state]);
 
   const handleTabChange = (tab) => {
     setSelectedTab(tab);
@@ -28,6 +33,29 @@ const AssessmentPage = ({ data }) => {
     if (sectionElement) {
       sectionElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
+  };
+
+  const handleSubmit = async (tabName) => {
+    try {
+      const response = await axios.post('http://localhost:5000/save', {
+        assessmentID,
+        formData,
+      });
+      console.log(response.data.message);
+      console.log("response");
+    } catch (error) {
+      console.error('Error saving data:', error);
+    }
+  };
+
+  const handleFieldChange = (tabName, fieldName, value) => {
+    setFormData(prevState => ({
+      ...prevState,
+      [tabName]: {
+        ...prevState[tabName],
+        [fieldName]: value,
+      }
+    }));
   };
 
   const filteredSections = data.filter(item => item.Tab === selectedTab);
@@ -43,7 +71,13 @@ const AssessmentPage = ({ data }) => {
           selectedTab={selectedTab}
           onTabChange={handleTabChange}
         />
-        <MainContent fields={filteredFields} sections={sections} />
+        <MainContent
+          fields={filteredFields}
+          sections={sections}
+          assessmentID={assessmentID}
+          onFieldChange={handleFieldChange}
+          onSubmit={handleSubmit}
+        />
         <RightPanel
           sections={sections}
           onSectionChange={handleSectionChange}

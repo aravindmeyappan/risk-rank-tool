@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import './MainContent.css';
 import { validatePlayerID } from './validations';
+import axios from 'axios'; // Import Axios
 
-const MainContent = ({ fields, sections }) => {
+const MainContent = ({ fields, sections, assessmentID }) => {
   const [formData, setFormData] = useState({});
   const [errors, setErrors] = useState({});
 
@@ -58,32 +59,9 @@ const MainContent = ({ fields, sections }) => {
     return formData[section]?.[fieldName]?.[`input${inputIndex}`] === fields.find(field => field['Field-name'] === fieldName)[`default_input${inputIndex}`];
   };
 
-  // const handleEditableButtonClick = (section, fieldName, inputIndex, targetFieldName) => {
-  //   let targetValue = 'Please input the necessary values for calculation';
-    
-  //   for (const sectionKey in formData) {
-  //     if (formData[sectionKey][targetFieldName]) {
-  //       targetValue = formData[sectionKey][targetFieldName][`input${inputIndex}`] || targetValue;
-  //       break;
-  //     }
-  //   }
-
-  //   console.log(targetValue);
-
-  //   setFormData(prevFormData => ({
-  //     ...prevFormData,
-  //     [section]: {
-  //       ...prevFormData[section],
-  //       [fieldName]: {
-  //         ...prevFormData[section]?.[fieldName],
-  //         [`input${inputIndex}`]: targetValue,
-  //       }
-  //     }
-  //   }));
-  // };
   const handleEditableButtonClick = (section, fieldName, inputIndex, formData, formula) => {
     const { fields, operator } = parseFormula(formula);
-  
+
     let values = fields.map(field => {
       for (const sec in formData) {
         for (const f in formData[sec]) {
@@ -94,12 +72,12 @@ const MainContent = ({ fields, sections }) => {
       }
       return null;
     });
-  
+
     if (values.includes(null) || values.includes('')) {
       alert('Please enter all necessary columns for evaluation');
       return;
     }
-  
+
     let result;
     switch (operator) {
       case '+':
@@ -129,9 +107,9 @@ const MainContent = ({ fields, sections }) => {
       default:
         result = 'Invalid formula';
     }
-  
+
     console.log(result);
-  
+
     setFormData(prevFormData => ({
       ...prevFormData,
       [section]: {
@@ -143,19 +121,17 @@ const MainContent = ({ fields, sections }) => {
       }
     }));
   };
-  
-  
 
   const parseFormula = (formula) => {
     const operators = ['+', '-', '*', '/', 'Max', 'Min', 'yesand', 'noand'];
     let operator = null;
     let fields = [];
-  
+
     const yesAndMatch = formula.match(/yesand\(([^)]+)\)/);
     const noAndMatch = formula.match(/noand\(([^)]+)\)/);
     const maxMatch = formula.match(/Max\(([^)]+)\)/);
     const minMatch = formula.match(/Min\(([^)]+)\)/);
-  
+
     if (yesAndMatch) {
       operator = 'yesand';
       fields = yesAndMatch[1].split(',').map(f => f.trim());
@@ -177,16 +153,22 @@ const MainContent = ({ fields, sections }) => {
         }
       }
     }
-  
+
     return { fields, operator };
   };
-  
-  
 
-  const handleSubmit = () => {
-    const submittedData = { ...formData };
-    console.log('Form Data on Submit:', submittedData);
-    // Perform any additional actions with formData, such as sending it to a server
+  const handleSubmit = async () => {
+    try {
+      const response = await axios.post('http://localhost:5000/save', {
+        assessmentID: {assessmentID}, // Replace with your assessment ID logic
+        formData,
+      });
+      console.log(response.data.message); // Log success message
+      // Optionally handle success actions like showing a success message to the user
+    } catch (error) {
+      console.error('Error saving data:', error); // Log any errors
+      // Optionally handle error actions like showing an error message to the user
+    }
   };
 
   return (

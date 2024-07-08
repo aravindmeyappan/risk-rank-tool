@@ -1,5 +1,3 @@
-// src/components/LeftPanel.js
-
 import React from 'react';
 
 const LeftPanel = ({ tabs, selectedTab, onTabChange }) => (

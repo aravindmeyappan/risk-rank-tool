@@ -1,31 +1,64 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AuthModal from '../components/AuthModal';
+import RetrieveModal from '../components/RetrieveModal';
 import './HomePage.css';
 
 const HomePage = () => {
-  const [showModal, setShowModal] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [showRetrieveModal, setShowRetrieveModal] = useState(false);
   const navigate = useNavigate();
 
-  const handleOpenModal = () => {
-    setShowModal(true);
+  const handleOpenAuthModal = () => {
+    setShowAuthModal(true);
   };
 
-  const handleCloseModal = () => {
-    setShowModal(false);
+  const handleCloseAuthModal = () => {
+    setShowAuthModal(false);
+  };
+
+  const handleOpenRetrieveModal = () => {
+    setShowRetrieveModal(true);
+  };
+
+  const handleCloseRetrieveModal = () => {
+    setShowRetrieveModal(false);
   };
 
   const handleAuthenticate = (assessmentID, modelID) => {
-    // Perform authentication here and navigate to assessment page
     console.log('Authenticated with:', assessmentID, modelID);
-    navigate('/assessment', { state: { assessmentID } }); // Pass assessmentID to AssessmentPage
+    navigate('/assessment', { state: { assessmentID } });
+  };
+
+  const handleRetrieve = async (assessmentID, modelID) => {
+    try {
+      const response = await fetch('http://localhost:3001/api/retrieve', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ assessmentID, modelID }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        navigate('/assessment', { state: { assessmentID, data } });
+      } else {
+        alert('Assessment not found.');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      alert('An error occurred while retrieving the assessment.');
+    }
   };
 
   return (
     <div className="home-page">
       <h1>Welcome to the Home Page</h1>
-      <button className="navigate-button" onClick={handleOpenModal}>Go to Assessment Page</button>
-      <AuthModal show={showModal} onClose={handleCloseModal} onAuthenticate={handleAuthenticate} />
+      <button className="navigate-button" onClick={handleOpenAuthModal}>Create New Assessment</button>
+      <button className="navigate-button" onClick={handleOpenRetrieveModal}>Open Existing Assessment</button>
+      <AuthModal show={showAuthModal} onClose={handleCloseAuthModal} onAuthenticate={handleAuthenticate} />
+      <RetrieveModal show={showRetrieveModal} onClose={handleCloseRetrieveModal} onRetrieve={handleRetrieve} />
     </div>
   );
 };
