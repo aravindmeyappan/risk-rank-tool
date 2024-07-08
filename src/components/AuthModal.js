@@ -1,15 +1,18 @@
+// AuthModal.js
+
 import React, { useState } from 'react';
 import './AuthModal.css';
+import { generateRandomId } from '../utils/utils'; 
 
 const AuthModal = ({ show, onClose, onAuthenticate }) => {
-  const [assessmentID, setAssessmentID] = useState('');
   const [modelID, setModelID] = useState('');
 
   const handleAuthenticate = () => {
-    if (assessmentID && modelID) {
+    const assessmentID = generateRandomId(); // Generate new assessment ID
+    if (modelID) {
       onAuthenticate(assessmentID, modelID);
     } else {
-      alert('Please enter both Assessment ID and Model ID.');
+      alert('Please enter Model ID.');
     }
   };
 
@@ -22,14 +25,6 @@ const AuthModal = ({ show, onClose, onAuthenticate }) => {
       <div className="modal-content">
         <h2>Authentication</h2>
         <div className="modal-body">
-          <label>
-            Assessment ID:
-            <input
-              type="text"
-              value={assessmentID}
-              onChange={(e) => setAssessmentID(e.target.value)}
-            />
-          </label>
           <label>
             Model ID:
             <input

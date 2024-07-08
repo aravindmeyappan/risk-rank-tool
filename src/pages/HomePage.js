@@ -16,9 +16,9 @@ const HomePage = () => {
   };
 
   const handleAuthenticate = (assessmentID, modelID) => {
-    // Perform authentication here
+    // Perform authentication here and navigate to assessment page
     console.log('Authenticated with:', assessmentID, modelID);
-    navigate('/assessment');
+    navigate('/assessment', { state: { assessmentID } }); // Pass assessmentID to AssessmentPage
   };
 
   return (

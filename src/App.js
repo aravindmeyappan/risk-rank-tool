@@ -1,5 +1,7 @@
+// App.js
+
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import HomePage from './pages/HomePage';
 import AssessmentPage from './pages/AssessmentPage';
 import { readExcelFile } from './utils/excelReader';
@@ -7,6 +9,7 @@ import './App.css';
 
 function App() {
   const [data, setData] = useState([]);
+  const [assessmentID, setAssessmentID] = useState('');
 
   useEffect(() => {
     const fetchExcelData = async () => {
@@ -19,18 +22,16 @@ function App() {
     fetchExcelData();
   }, []);
 
+  const handleAuthenticate = (generatedID) => {
+    setAssessmentID(generatedID);
+  };
+
   return (
     <Router>
       <div className="App">
-        {/* <nav>
-          <ul>
-            <li><Link to="/">Home</Link></li>
-            <li><Link to="/assessment">Assessment</Link></li>
-          </ul>
-        </nav> */}
         <Routes>
           <Route path="/" element={<HomePage />} />
-          <Route path="/assessment" element={<AssessmentPage data={data} />} />
+          <Route path="/assessment" element={<AssessmentPage data={data} assessmentID={assessmentID} />} />
         </Routes>
       </div>
     </Router>

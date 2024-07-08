@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import TopBar from '../components/TopBar';
 import LeftPanel from '../components/LeftPanel';
 import MainContent from '../components/MainContent';
@@ -8,7 +8,10 @@ import './AssessmentPage.css';
 
 const AssessmentPage = ({ data }) => {
   const [selectedTab, setSelectedTab] = useState('');
-  const navigate = useNavigate(); // Import and use useNavigate
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { state } = location;
+  const assessmentID = state ? state.assessmentID : '';
 
   useEffect(() => {
     if (data.length > 0) {
@@ -33,7 +36,7 @@ const AssessmentPage = ({ data }) => {
 
   return (
     <div className="assessment-page">
-      <TopBar navigateHome={() => navigate('/')} />
+      <TopBar navigateHome={() => navigate('/')} assessmentID={assessmentID} />
       <div className="container">
         <LeftPanel
           tabs={Array.from(new Set(data.map(item => item.Tab)))}
