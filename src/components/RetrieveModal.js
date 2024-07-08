@@ -4,18 +4,20 @@ import './RetrieveModal.css';
 
 const RetrieveModal = ({ show, onClose, onRetrieve }) => {
   const [assessmentID, setAssessmentID] = useState('');
-  const [modelID, setModelID] = useState('');
 
   const handleRetrieve = async () => {
-    if (assessmentID && modelID) {
+    if (assessmentID) {
       try {
-        const response = await axios.post('http://localhost:5000/retrieve', { assessmentID, modelID });
+        const response = await axios.get(`http://localhost:5000/retrieve`, { params: { assessmentID } });
         onRetrieve(response.data);
+        console.log('Assessment ID:', assessmentID)
+        console.log('Retrieved data:', response.data);
       } catch (error) {
         console.error('Error retrieving data:', error);
+        alert('Assessment not found.');
       }
     } else {
-      alert('Please enter both Assessment ID and Model ID.');
+      alert('Please enter Assessment ID.');
     }
   };
 
@@ -34,14 +36,6 @@ const RetrieveModal = ({ show, onClose, onRetrieve }) => {
               type="text"
               value={assessmentID}
               onChange={(e) => setAssessmentID(e.target.value)}
-            />
-          </label>
-          <label>
-            Model ID:
-            <input
-              type="text"
-              value={modelID}
-              onChange={(e) => setModelID(e.target.value)}
             />
           </label>
         </div>

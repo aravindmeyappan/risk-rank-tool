@@ -30,28 +30,10 @@ const HomePage = () => {
     navigate('/assessment', { state: { assessmentID } });
   };
 
-  const handleRetrieve = async (assessmentID, modelID) => {
-    try {
-      const response = await fetch('http://localhost:3001/api/retrieve', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ assessmentID, modelID }),
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        navigate('/assessment', { state: { assessmentID, data } });
-      } else {
-        alert('Assessment not found.');
-      }
-    } catch (error) {
-      console.error('Error:', error);
-      alert('An error occurred while retrieving the assessment.');
-    }
+  const handleRetrieve = async (data) => {
+    navigate('/assessment', { state: { assessmentID: data.assessmentID, data: data.data } });
   };
-
+  
   return (
     <div className="home-page">
       <h1>Welcome to the Home Page</h1>
