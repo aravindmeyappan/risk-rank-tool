@@ -39,6 +39,7 @@ const AssessmentPage = ({ data }) => {
     try {
       const response = await axios.post('http://localhost:5000/save', {
         assessmentID,
+        activeTab: selectedTab,
         formData,
       });
       console.log(response.data.message);
@@ -75,6 +76,7 @@ const AssessmentPage = ({ data }) => {
           fields={filteredFields}
           sections={sections}
           assessmentID={assessmentID}
+          selectedTab={selectedTab}
           onFieldChange={handleFieldChange}
           onSubmit={handleSubmit}
         />

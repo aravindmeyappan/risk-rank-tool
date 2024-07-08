@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import './MainContent.css';
 import { validatePlayerID } from './validations';
-import axios from 'axios'; // Import Axios
+import axios from 'axios'; 
 
-const MainContent = ({ fields, sections, assessmentID }) => {
+const MainContent = ({ fields, sections, assessmentID, selectedTab }) => {
   const [formData, setFormData] = useState({});
   const [errors, setErrors] = useState({});
 
@@ -158,16 +158,16 @@ const MainContent = ({ fields, sections, assessmentID }) => {
   };
 
   const handleSubmit = async () => {
+    console.log('Submitting data:', { assessmentID, selectedTab, formData });
     try {
       const response = await axios.post('http://localhost:5000/save', {
-        assessmentID: {assessmentID}, // Replace with your assessment ID logic
-        formData,
+        assessmentID,
+        selectedTab,
+        formData
       });
-      console.log(response.data.message); // Log success message
-      // Optionally handle success actions like showing a success message to the user
+      console.log('Data saved successfully:', response.data);
     } catch (error) {
-      console.error('Error saving data:', error); // Log any errors
-      // Optionally handle error actions like showing an error message to the user
+      console.error('Error saving data:', error);
     }
   };
 
