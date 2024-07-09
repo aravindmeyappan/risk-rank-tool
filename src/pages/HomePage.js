@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AuthModal from '../components/AuthModal';
 import RetrieveModal from '../components/RetrieveModal';
+import TopBar from './topbarhomepage'
 import './HomePage.css';
 
 const HomePage = () => {
@@ -36,9 +37,9 @@ const HomePage = () => {
   
   return (
     <div className="home-page">
-      <h1>Welcome to the Home Page</h1>
-      <button className="navigate-button" onClick={handleOpenAuthModal}>Create New Assessment</button>
-      <button className="navigate-button" onClick={handleOpenRetrieveModal}>Open Existing Assessment</button>
+      <TopBar/>
+      <button className="navigate-button-new" onClick={handleOpenAuthModal}>Create New Assessment</button>
+      <button className="navigate-button-old" onClick={handleOpenRetrieveModal}>Open Existing Assessment</button>
       <AuthModal show={showAuthModal} onClose={handleCloseAuthModal} onAuthenticate={handleAuthenticate} />
       <RetrieveModal show={showRetrieveModal} onClose={handleCloseRetrieveModal} onRetrieve={handleRetrieve} />
     </div>

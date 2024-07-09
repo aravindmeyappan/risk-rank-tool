@@ -1,0 +1,7 @@
+.top-bar {
+    justify-content: space-between;
+    align-items: center;
+    background-color: rgb(215, 40, 30);
+    padding: 1rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
